@@ -5,12 +5,13 @@
 ### Import Python Libraries ###
 import pandas as pd
 from pandas import DataFrame
-from numpy import array
+from numpy import array, matrix
 
 ### Import R Libraries ###
 import rpy2.robjects as R
 from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
+pandas2ri.activate()
 base = importr("base")
 utils = importr("utils")
 odtpackage = importr("dbscan")
@@ -28,17 +29,38 @@ class GlobalKNN(object):
 
     ### Global KNN Distance estimation Function ###
     def kNNDistance(self):
-        return odtpackage.kNNdist( base.as_matrix(self.xdf), self.minPts)
+        rdf = pandas2ri.py2ri(self.xdf)
+        return odtpackage.kNNdist(base.as_matrix(rdf), self.minPts)
 
     ### Global KNN Execution Function ###
-    def getOutlier(self, threshold, label= False):
-        knn = self.kNNDistance()
-        self.distance = knn['distance']
-        self.indices = knn['indices']
-        self.k = knn['k']
+    def getOutlier(self, threshold=0.5, label=False):
+        score = []
+        label = []
+
+        distance = array(self.kNNDistance())
+        for i in range(0, len(distance)):
+            score.append(reduce(lambda x, y: x+y, list(distance[i]))/self.minPts)
+            if score[i] > threshold:
+                label.append('outlier')
+            else:
+                label.append('normal')
+
+        return DataFrame(data={'Score': score, 'Label': label}, )
+
 
 if __name__ == "__main__":
-    pass
+    url = '/Users/warchief/Documents/Projects/DataRepository/AnomalyDetection/test.csv'
+    df = DataFrame.from_csv(path=url, header=0, sep=',', index_col=False)
+
+    X = df['SL_RRC_CONN_AVG_PER_CELL'].values
+    Y = df['I_DL_DRB_CELL_TPUT_MBPS'].values
+
+    d = {'x': X, 'y': Y}
+    pdf = DataFrame(data=d)
+    nn = GlobalKNN(pdf, 200)
+    print nn.getOutlier(0.5)
+
+
 
 
 

@@ -39,7 +39,7 @@ class GlobalKNN(object):
         return odtpackage.kNNdist(base.as_matrix(rdf), self.minPts)
 
     ### Global KNN Execution Function ###
-    def getOutlier(self, threshold=0.5, label=False):
+    def getOutlier(self, threshold=0.5):
         distance = array(self.kNNDistance(self.xdf))
         for i in range(0, len(distance)):
             self.score.append(reduce(lambda x, y: x+y, list(distance[i]))/self.minPts)

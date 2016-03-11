@@ -1,5 +1,5 @@
 ###############################################
-## Local Outlier Factor (LOF) Implementation ##
+## OPTICS-OF Implementation ##
 ###############################################
 
 ### Import Python Libraries ###
@@ -17,15 +17,16 @@ utils = importr("utils")
 odtpackage = importr("dbscan")
 
 
-######################
-## Global LOF Class ##
-######################
-class DBSCAN(object):
+##################
+## OPTICS Class ##
+##################
+class OPTICS(object):
 
-    ### DBSCAN Class Constructor ###
-    def __init__(self, xdf, epsilon, minPts):
+    ### OPTICS Class Constructor ###
+    def __init__(self, xdf, eps_up, eps_cl, minPts):
         self.xdf = xdf
-        self.epsilon = epsilon
+        self.eps_up = eps_up
+        self.eps_cl = eps_cl
         self.minPts = minPts
         self.label = []
         self.cluster = []
@@ -34,17 +35,16 @@ class DBSCAN(object):
     def normalizeData(self):
         pass
 
-    ### DBSCAN clustering estimation Function ###
-    def DBSCAN(self, xdf):
-        if len(xdf) > 100000:
-            print "Warning! DBSCAN might fail for large dataset."
-
+    ### OPTICS clustering estimation Function ###
+    def OPTICS(self, xdf):
         rdf = pandas2ri.py2ri(xdf)
-        return odtpackage.dbscan(base.as_matrix(rdf), self.epsilon, self.minPts)
+        rez = odtpackage.optics(base.as_matrix(rdf), self.eps_up, self.minPts)
+        return odtpackage.optics_cut(rez, self.eps_cl)
 
-    ### DBSCAN Execution Function ###
+    ### OPTICS Execution Function ###
     def getOutlier(self):
-        cls = self.DBSCAN(self.xdf)
+        cls = self.OPTICS(self.xdf)
+
         print cls
         for i in array(cls.rx2('cluster')):
             self.cluster.append(i)
@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
     d = {'x': X, 'y': Y}
     pdf = DataFrame(data=d)
-    db = DBSCAN(pdf, 0.5, 50)
+    db = OPTICS(pdf, 1, 0.5, 50)
     print db.getOutlier()
 
 

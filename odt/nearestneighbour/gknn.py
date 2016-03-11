@@ -26,26 +26,29 @@ class GlobalKNN(object):
     def __init__(self, xdf, minPts):
         self.xdf = xdf
         self.minPts = minPts
+        self.score = []
+        self.label = []
+
+    ### [TODO:] Implement Nromalization functionality ###
+    def normalizeData(self):
+        pass
 
     ### Global KNN Distance estimation Function ###
-    def kNNDistance(self):
-        rdf = pandas2ri.py2ri(self.xdf)
+    def kNNDistance(self, xdf):
+        rdf = pandas2ri.py2ri(xdf)
         return odtpackage.kNNdist(base.as_matrix(rdf), self.minPts)
 
     ### Global KNN Execution Function ###
     def getOutlier(self, threshold=0.5, label=False):
-        score = []
-        label = []
-
-        distance = array(self.kNNDistance())
+        distance = array(self.kNNDistance(self.xdf))
         for i in range(0, len(distance)):
-            score.append(reduce(lambda x, y: x+y, list(distance[i]))/self.minPts)
-            if score[i] > threshold:
-                label.append('outlier')
+            self.score.append(reduce(lambda x, y: x+y, list(distance[i]))/self.minPts)
+            if self.score[i] > threshold:
+                self.label.append('outlier')
             else:
-                label.append('normal')
+                self.label.append('normal')
 
-        return DataFrame(data={'Score': score, 'Label': label}, )
+        return DataFrame(data={'Score': self.score, 'Label': self.label}, )
 
 
 if __name__ == "__main__":

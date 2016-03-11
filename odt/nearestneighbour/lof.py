@@ -1,6 +1,6 @@
-###############################
-## Global KNN Implementation ##
-###############################
+###############################################
+## Local Outlier Factor (LOF) Implementation ##
+###############################################
 
 ### Import Python Libraries ###
 import pandas as pd
@@ -22,7 +22,7 @@ odtpackage = importr("dbscan")
 ######################
 class LOF(object):
 
-    ### Global LOF Class Constructor ###
+    ### LOF Class Constructor ###
     def __init__(self, xdf, minPts):
         self.xdf = xdf
         self.minPts = minPts
@@ -33,12 +33,12 @@ class LOF(object):
     def normalizeData(self):
         pass
 
-    ### Global LOF Distance estimation Function ###
+    ### LOF Distance estimation Function ###
     def LOF(self, xdf):
         rdf = pandas2ri.py2ri(xdf)
         return odtpackage.lof(base.as_matrix(rdf), self.minPts)
 
-    ### Global KNN Execution Function ###
+    ### LOF Execution Function ###
     def getOutlier(self, threshold=1):
         lof = array(self.LOF(self.xdf))
         for i in range(0, len(lof)):
